@@ -23,6 +23,7 @@ function App() {
     const responseTimeoutRef = useRef(null);
     const lastMessageIdRef = useRef(null);
     const currentBotResponseRef = useRef("");
+    const [isThinking, setIsThinking] = useState(false);
 
     // Initialize and handle WebSocket connection
     useEffect(() => {
@@ -41,6 +42,9 @@ function App() {
             }
 
             if (data.type === 'chunk' && data.content) {
+                // Reset typing state completely when first chunk arrives
+                setIsThinking(false);
+                
                 // Clear any existing timeout
                 if (responseTimeoutRef.current) {
                     clearTimeout(responseTimeoutRef.current);
@@ -144,20 +148,20 @@ function App() {
                 { content: inputMessage, id: Date.now(), sender: 'user' }
             ]);
 
+            // Show thinking indicator before sending the message
+            setIsThinking(true);
+
             socket.send(JSON.stringify(message));
-            
-            // Clear the input message immediately
             setInputMessage('');
             
             // If the microphone is currently on, turn it off after sending the message
             if (isListening) {
                 stopListening();
-            } else {
-                // Force the input field to reset even if not using voice
-                if (inputRef.current) {
-                    inputRef.current.value = '';
-                    inputRef.current.style.height = 'auto';
-                }
+            }
+            
+            // Reset the input height after sending
+            if (inputRef.current) {
+                inputRef.current.style.height = 'auto';
             }
         } else {
             console.error('WebSocket is not open or message is empty');
@@ -377,6 +381,19 @@ function App() {
                                         </div>
                                     </div>
                                 ))}
+                                
+                                {/* Typing indicator */}
+                                {isThinking && (
+                                    <div className="message-wrapper bot-wrapper">
+                                        <div className="message bot-message">
+                                            <div className="typing-dots">
+                                                <div className="typing-dot"></div>
+                                                <div className="typing-dot"></div>
+                                                <div className="typing-dot"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                                 
                                 {/* Streaming message */}
                                 {isReceivingMessage && botResponse && (
