@@ -74,7 +74,7 @@ body {
     position: absolute;
     bottom: 65px;
     right: 0;
-    width: 450px;
+    width: 480px;
     height: 820px;
     border-radius: 25px;
     display: flex;
@@ -184,7 +184,7 @@ body {
     flex: 1;
     background: linear-gradient(135deg, var(--chat-bg-gradient-start) 0%, var(--chat-bg-gradient-end) 100%);
     background-size: cover;
-    border-radius: 0 0 10px 10px;
+    border-radius: 00px;
     overflow: hidden;
 }
 
@@ -230,7 +230,7 @@ body {
 
 .message {
     padding: 8px 12px;
-    border-radius: 8px;
+    border-radius: 40px;
     max-width: 80%;
     word-wrap: break-word;
     margin-bottom: 10px;
@@ -276,7 +276,7 @@ body {
 .message-content code {
     background-color: rgba(0, 0, 0, 0.1);
     padding: 2px 4px;
-    border-radius: 3px;
+    border-radius: 30px;
     font-family: monospace;
     font-size: 90%;
 }
@@ -338,7 +338,7 @@ body {
 .message code {
     background-color: rgba(0, 0, 0, 0.1);
     padding: 2px 4px;
-    border-radius: 3px;
+    border-radius: 30px;
     font-family: monospace;
     font-size: 90%;
 }
@@ -346,7 +346,7 @@ body {
 .message pre {
     background-color: rgba(0, 0, 0, 0.05);
     padding: 8px;
-    border-radius: 4px;
+    border-radius: 30px;
     overflow-x: auto;
     margin: 8px 0;
 }
@@ -377,7 +377,7 @@ body {
     flex: 1;
     padding: 14px 18px;
     border: none;
-    border-radius: 18px;
+    border-radius: 25px;
     outline: none;
     background-color: #ffffff; /* Pure white background */
     margin-right: 12px;
@@ -535,12 +535,12 @@ body {
 /* Add more visual distinction between messages */
 .user-message {
     background-color: #dcf8c6b6;
-    border-top-right-radius: 0;
+    border-top-right-radius: 2px;
 }
 
 .bot-message {
     background-color: white;
-    border-top-left-radius: 0;
+    border-top-left-radius: 2px;
 }
 
 /* Enhance the streaming message indicator */
@@ -569,7 +569,7 @@ body {
 /* Update the message bubbles to be rectangular */
 .message {
     padding: 8px 12px;
-    border-radius: 8px;
+    border-radius: 25px;
     max-width: 80%;
     word-wrap: break-word;
     margin-bottom: 8px;
@@ -608,7 +608,7 @@ body {
 .static-image img {
     width: 70px;
     height: 45px;
-    border-radius: 4x;
+    border-radius: 20px;
     object-fit: cover;
     border: 2px solid rgba(255, 255, 255, 0.6);
 }
