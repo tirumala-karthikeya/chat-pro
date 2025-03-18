@@ -4,6 +4,7 @@ import './Dashboard.css';
 function Dashboard() {
     const [chatbots, setChatbots] = useState([]);
     const [showForm, setShowForm] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
     const [currentBot, setCurrentBot] = useState({
         id: '',
         name: '',
@@ -17,13 +18,18 @@ function Dashboard() {
         bodyBackgroundImage: '',
         welcomeText: 'Welcome to our assistant! How can I help you today?',
         apiKey: '',
-        uniqueId: generateUniqueId() // Add unique ID for the URL
+        uniqueId: generateUniqueId()
     });
 
     // Generate a random unique ID
     function generateUniqueId() {
         return Math.random().toString(36).substring(2, 12);
     }
+
+    // Filter chatbots based on search term
+    const filteredChatbots = chatbots.filter(bot => 
+        bot.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     useEffect(() => {
         // Load saved chatbots from localStorage
@@ -62,15 +68,14 @@ function Dashboard() {
         }
     };
 
+    // Validate API key format
     const validateApiKey = async (apiKey) => {
         try {
-            // You can add a simple validation endpoint in your API
-            // Or just check if it matches the expected format
             if (!apiKey || apiKey.trim() === '') {
                 return { valid: false, message: "API key cannot be empty" };
             }
             
-            // Check for a valid Next-AGI API key format (if you know it)
+            // Check for a valid Next-AGI API key format
             const validFormat = /^app-[a-zA-Z0-9]{24,}$/;
             if (!validFormat.test(apiKey)) {
                 return { 
@@ -136,7 +141,9 @@ function Dashboard() {
     };
 
     const deleteChatbot = (id) => {
-        setChatbots(chatbots.filter(bot => bot.id !== id));
+        if (window.confirm("Are you sure you want to delete this chatbot?")) {
+            setChatbots(chatbots.filter(bot => bot.id !== id));
+        }
     };
 
     const launchChatbot = (bot) => {
@@ -148,16 +155,122 @@ function Dashboard() {
     };
 
     return (
-        <div className="dashboard-container">
-            <header className="dashboard-header">
-                <h1>Chatbot Management Dashboard</h1>
-                <button 
-                    className="create-button"
-                    onClick={() => setShowForm(true)}
-                >
-                    Create New Chatbot
-                </button>
-            </header>
+        <div className="dashboard-wrapper">
+            <div className="dashboard-background"></div>
+            <div className="dashboard-container">
+                <header className="dashboard-header">
+                    <div className="header-left">
+                        <div className="company-logo">
+                            <img src="/logo.jpeg" alt="Company Logo" />
+                        </div>
+                        <h1>Chatbot Management</h1>
+                    </div>
+                    
+                    <div className="header-right">
+                        <div className="search-bar">
+                            <input 
+                                type="text"
+                                placeholder="Search chatbots..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18">
+                                <path d="M21.71 20.29l-5.4-5.4A8 8 0 1 0 15 16l5.4 5.4a1 1 0 0 0 1.41-1.41zM10 16a6 6 0 1 1 6-6 6 6 0 0 1-6 6z" fill="#555"/>
+                            </svg>
+                        </div>
+                        <button 
+                            className="create-button"
+                            onClick={() => setShowForm(true)}
+                        >
+                            <span>+</span> Create New Chatbot
+                        </button>
+                    </div>
+                </header>
+
+                <div className="dashboard-content">
+                    {filteredChatbots.length === 0 ? (
+                        <div className="no-chatbots">
+                            {searchTerm ? (
+                                <p>No chatbots found matching "{searchTerm}"</p>
+                            ) : (
+                                <div>
+                                    <p>No chatbots have been created yet.</p>
+                                    <button 
+                                        className="create-first-button"
+                                        onClick={() => setShowForm(true)}
+                                    >
+                                        Create Your First Chatbot
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="chatbots-grid">
+                            {filteredChatbots.map(bot => (
+                                <div key={bot.id} className="chatbot-card">
+                                    <div className="card-header">
+                                        <div 
+                                            className="chatbot-logo" 
+                                            style={{backgroundColor: bot.chatLogoColor}}
+                                            onClick={() => launchChatbot(bot)}
+                                        >
+                                            {bot.chatLogoImage ? (
+                                                <img src={bot.chatLogoImage} alt={bot.name} />
+                                            ) : (
+                                                <div className="default-logo">{bot.name.charAt(0)}</div>
+                                            )}
+                                        </div>
+                                        <h3>{bot.name}</h3>
+                                    </div>
+                                    <div className="card-content">
+                                        <div className="unique-url">
+                                            <div className="url-label">Unique URL:</div>
+                                            <div className="url-value">/chatbot/{bot.name}/{bot.uniqueId.substring(0, 5)}...</div>
+                                        </div>
+                                        <div className="card-preview">
+                                            <div className="preview-item">
+                                                <span className="preview-label">Header:</span>
+                                                <span className="color-preview" style={{backgroundColor: bot.chatHeaderColor}}></span>
+                                            </div>
+                                            <div className="preview-item">
+                                                <span className="preview-label">Gradient:</span>
+                                                <span 
+                                                    className="gradient-preview" 
+                                                    style={{
+                                                        background: `linear-gradient(to right, ${bot.chatBgGradientStart}, ${bot.chatBgGradientEnd})`
+                                                    }}
+                                                ></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="card-actions">
+                                        <button onClick={() => editChatbot(bot)} className="edit-button">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                                            </svg>
+                                            Edit
+                                        </button>
+                                        <button onClick={() => deleteChatbot(bot.id)} className="delete-button">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                                <path fillRule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                            </svg>
+                                            Delete
+                                        </button>
+                                        <button onClick={() => launchChatbot(bot)} className="launch-button">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                <path fillRule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z"/>
+                                                <path fillRule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z"/>
+                                            </svg>
+                                            Launch
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
 
             {showForm && (
                 <div className="form-overlay">
@@ -395,33 +508,10 @@ function Dashboard() {
                     </div>
                 </div>
             )}
-
-            <div className="chatbots-grid">
-                {chatbots.map(bot => (
-                    <div key={bot.id} className="chatbot-card">
-                        <div 
-                            className="chatbot-logo" 
-                            style={{backgroundColor: bot.chatLogoColor}}
-                            onClick={() => launchChatbot(bot)}
-                        >
-                            {bot.chatLogoImage ? (
-                                <img src={bot.chatLogoImage} alt={bot.name} />
-                            ) : (
-                                <div className="default-logo">{bot.name.charAt(0)}</div>
-                            )}
-                        </div>
-                        <h3>{bot.name}</h3>
-                        <div className="unique-url">
-                            <small>URL: /chatbot/{bot.name}/{bot.uniqueId}</small>
-                        </div>
-                        <div className="card-actions">
-                            <button onClick={() => editChatbot(bot)}>Edit</button>
-                            <button onClick={() => deleteChatbot(bot.id)}>Delete</button>
-                            <button onClick={() => launchChatbot(bot)}>Launch</button>
-                        </div>
-                    </div>
-                ))}
-            </div>
+            
+            <footer className="dashboard-footer">
+                <p>© 2023 Chatbot Management System</p>
+            </footer>
         </div>
     );
 }
