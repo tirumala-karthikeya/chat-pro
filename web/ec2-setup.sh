@@ -26,4 +26,4 @@ sudo systemctl restart nginx
 # Get SSL certificate (uncomment when domain is pointed to server)
 # sudo certbot --nginx -d agentics.xpectrum-ai.com -d www.agentics.xpectrum-ai.com
 
-echo "EC2 setup completed! You can now deploy your application." 
+echo "EC2 setup completed! You can now deploy your application."
