@@ -18,6 +18,7 @@ function Dashboard() {
         bodyBackgroundImage: '',
         welcomeText: 'Welcome to our assistant! How can I help you today?',
         apiKey: '',
+        analyticsUrl: 'http://localhost:8088/superset/dashboard/1/?native_filters_key=Fa1TCGahXdiVfZhNjZrPy3B1jZ9yTguoXRkKKmBPW9w88GDy2Qc7wuFXjlp8oNtK',
         uniqueId: generateUniqueId()
     });
 
@@ -129,6 +130,7 @@ function Dashboard() {
             bodyBackgroundImage: '',
             welcomeText: 'Welcome to our assistant! How can I help you today?',
             apiKey: '',
+            analyticsUrl: 'http://localhost:8088/superset/dashboard/1/?native_filters_key=Fa1TCGahXdiVfZhNjZrPy3B1jZ9yTguoXRkKKmBPW9w88GDy2Qc7wuFXjlp8oNtK',
             uniqueId: generateUniqueId()
         });
         
@@ -163,7 +165,7 @@ function Dashboard() {
                         <div className="company-logo">
                             <img src="/logo.jpeg" alt="Company Logo" />
                         </div>
-                        <h1>Chatbot Management</h1>
+                        <h1>Agents Dashboard</h1>
                     </div>
                     
                     <div className="header-right">
@@ -249,6 +251,12 @@ function Dashboard() {
                                                 <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
                                             </svg>
                                             Edit
+                                        </button>
+                                        <button onClick={() => window.open(bot.analyticsUrl, '_blank')} className="analytics-button">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M0 0h16v16H0V0zm1 1v14h14V1H1zm1 1h12v12H2V2zm2 9h2v2H4v-2zm3 0h2v2H7v-2zm3 0h2v2h-2v-2zM4 8h2v2H4V8zm3 0h2v2H7V8zm3 0h2v2h-2V8zM4 5h2v2H4V5zm3 0h2v2H7V5zm3 0h2v2h-2V5z"/>
+                                            </svg>
+                                            Analytics
                                         </button>
                                         <button onClick={() => deleteChatbot(bot.id)} className="delete-button">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -473,6 +481,18 @@ function Dashboard() {
                                         required
                                     />
                                 </div>
+
+                                <div className="form-group">
+                                    <label>Analytics URL</label>
+                                    <input 
+                                        type="text" 
+                                        name="analyticsUrl" 
+                                        value={currentBot.analyticsUrl} 
+                                        onChange={handleInputChange}
+                                        placeholder="Enter analytics dashboard URL"
+                                    />
+                                    <small className="form-help">URL to your analytics dashboard for this chatbot</small>
+                                </div>
                             </div>
 
                             <div className="form-actions">
@@ -497,6 +517,7 @@ function Dashboard() {
                                             bodyBackgroundImage: '',
                                             welcomeText: 'Welcome to our assistant! How can I help you today?',
                                             apiKey: '',
+                                            analyticsUrl: 'http://localhost:8088/superset/dashboard/1/?native_filters_key=Fa1TCGahXdiVfZhNjZrPy3B1jZ9yTguoXRkKKmBPW9w88GDy2Qc7wuFXjlp8oNtK',
                                             uniqueId: generateUniqueId()
                                         });
                                     }}
