@@ -154,8 +154,11 @@ function Dashboard() {
     const getChatbotFullUrl = (bot) => {
         // Use production domain for QR codes and links
         const isProd = process.env.NODE_ENV === 'production';
+        // Get protocol (HTTP/HTTPS)
+        const protocol = window.location.protocol;
+        // If in production, use the domain from env and current protocol
         const baseUrl = isProd 
-            ? 'https://agentics.xpectrum-ai.com' 
+            ? `${protocol}//agentics.xpectrum-ai.com` 
             : window.location.origin;
             
         return `${baseUrl}/chatbot/${encodeURIComponent(bot.name)}/${bot.uniqueId}`;
