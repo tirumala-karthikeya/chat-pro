@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  chatbot-dashboard:
+    container_name: chatbot-dashboard
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_DOMAIN=https://agentics.xpectrum-ai.com
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro  # For SSL certificates if using Certbot outside Docker 

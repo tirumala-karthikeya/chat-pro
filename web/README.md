@@ -10,53 +10,61 @@ A comprehensive dashboard for creating and managing customizable chatbots. Each 
 - Analytics integration
 - Responsive design
 
-## Deployment Instructions for AWS EC2
+## Deployment Instructions with Docker
 
 ### Prerequisites
 
 - AWS EC2 instance running Ubuntu
 - Domain name pointed to your EC2 instance IP (35.164.58.94)
 - SSH key pair for EC2 access
+- Docker and Docker Compose installed locally (for development)
 
 ### Deployment Steps
 
 #### 1. Update SSH Key Path
 
 Before running any of the scripts, make sure to update the SSH key path in the following files:
-- `setup-remote.sh`
-- `deploy.sh`
+- `setup-docker-remote.sh`
+- `docker-deploy.sh`
 
 Change the `SSH_KEY_PATH` variable to point to your EC2 key file:
 ```bash
 SSH_KEY_PATH="~/.ssh/your-actual-key-name.pem"
 ```
 
-#### 2. Initial Server Setup
+#### 2. Set Up Docker on EC2
 
-Run the remote setup script to configure the EC2 instance:
+Run the script to set up Docker on your EC2 instance:
 
 ```bash
-./setup-remote.sh
+chmod +x setup-docker-remote.sh
+./setup-docker-remote.sh
 ```
 
 This script will:
-- Copy nginx configuration to your EC2 instance
-- Copy and execute the EC2 setup script on your instance
-- Install and configure Nginx
-- Set up proper permissions
+- Copy the Docker setup script to your EC2 instance
+- Install Docker and Docker Compose on your EC2 instance
+- Configure Docker to start on boot
 
 #### 3. Build and Deploy the Application
 
-After the server is set up, deploy the application:
+After Docker is set up on the EC2 instance, build and deploy the application:
 
 ```bash
-./deploy.sh
+# First, build the Docker image locally
+chmod +x docker-build.sh
+./docker-build.sh
+
+# Then, deploy it to EC2
+chmod +x docker-deploy.sh
+./docker-deploy.sh
 ```
 
-This script will:
-- Build the React application
-- Copy the build files to your EC2 instance
-- Copy the nginx configuration if it doesn't exist
+The deployment script will:
+- Save the Docker image as a tar file
+- Copy the image and Docker Compose file to your EC2 instance
+- Load the image on your EC2 instance
+- Start the application using Docker Compose
 
 #### 4. SSL Configuration (Optional but Recommended)
 
@@ -67,33 +75,76 @@ To enable HTTPS for your domain:
    ssh -i ~/.ssh/your-key.pem ubuntu@35.164.58.94
    ```
 
-2. Run Certbot to obtain and configure SSL certificates:
+2. Install Certbot:
    ```bash
-   sudo certbot --nginx -d agentics.xpectrum-ai.com -d www.agentics.xpectrum-ai.com
+   sudo apt update
+   sudo apt install -y certbot
    ```
 
-3. Follow the prompts to complete the process
+3. Obtain SSL certificates:
+   ```bash
+   sudo certbot certonly --standalone -d agentics.xpectrum-ai.com -d www.agentics.xpectrum-ai.com
+   ```
+
+4. Update your docker-compose.yml to use the SSL certificates:
+   ```yaml
+   services:
+     chatbot-dashboard:
+       # ... existing config ...
+       ports:
+         - "80:80"
+         - "443:443"
+       volumes:
+         - /etc/letsencrypt:/etc/letsencrypt:ro
+   ```
+
+5. Update nginx.docker.conf to handle HTTPS
+
+### Updating the Application
+
+When you make changes to your application:
+
+1. Build a new Docker image:
+   ```bash
+   ./docker-build.sh
+   ```
+
+2. Deploy the updated image:
+   ```bash
+   ./docker-deploy.sh
+   ```
+
+The deployment process will automatically stop the old container and start a new one with your updates.
 
 ### Troubleshooting
 
-- **Nginx Configuration Issues**: Check the Nginx error logs:
+- **Docker Issues**: Check Docker logs:
   ```bash
-  sudo tail -f /var/log/nginx/error.log
+  docker logs chatbot-dashboard
   ```
 
-- **Permission Issues**: Ensure proper ownership of web files:
+- **Container Not Starting**: Check if ports are already in use:
   ```bash
-  sudo chown -R ubuntu:ubuntu /var/www/html
+  sudo netstat -tulpn | grep 80
   ```
 
-- **Restart Nginx**: After making changes to configuration:
+- **View Running Containers**:
   ```bash
-  sudo systemctl restart nginx
+  docker ps
   ```
 
 ## Development
 
-### Local Development
+### Local Development with Docker
+
+Build and run locally with Docker:
+```bash
+docker-compose up --build
+```
+
+Access the application at http://localhost:80
+
+### Traditional Local Development
 
 1. Install dependencies:
    ```bash
