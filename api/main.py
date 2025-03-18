@@ -242,6 +242,8 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
     WebSocket endpoint for real-time chat
     """
     await manager.connect(websocket, client_id)
+    api_key = None  # Initialize API key variable
+    
     try:
         while True:
             data = await websocket.receive_text()
@@ -250,6 +252,17 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
             try:
                 message_data = json.loads(data)
                 logging.info(f"Message data: {message_data}")
+                
+                # Get API key from the message data
+                if "api_key" in message_data:
+                    api_key = message_data["api_key"]
+                    logging.info(f"Using API key from message: {api_key[:5]}...{api_key[-4:] if len(api_key) > 10 else ''}")
+                
+                # Use default API key if none provided
+                if not api_key:
+                    api_key = NEXT_AGI_API_KEY
+                    logging.info(f"Using default API key: {api_key[:5]}...{api_key[-4:] if len(api_key) > 10 else ''}")
+                
                 # Process chat message
                 if "query" in message_data:
                     logging.info(f"Query: {message_data['query']}")
@@ -264,21 +277,15 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                         "files": message_data.get("files", [])
                     }
                     
+                    # Use the API key from the message
                     headers = {
-                        "Authorization": f"Bearer {NEXT_AGI_API_KEY}",
+                        "Authorization": f"Bearer {api_key}",
                         "Content-Type": "application/json"
                     }
                     
                     # Generate a new conversation ID if not provided
-                    
-                    
                     logging.info(f"payload: {payload}")
                     logger.debug(f"Conversation ID0: {conversation_id}")
-                    # Let the client know we're starting
-                    #await manager.send_message(json.dumps({
-                    #    "type": "start",
-                    #    "conversation_id": conversation_id
-                    #}), client_id)
                     
                     try:
                         # Make request with streaming enabled
@@ -301,7 +308,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
                                 "content": f"API error: Status code {response.status_code}"
                             }), client_id)
                             continue
-                        logger.debug(f"Conversation ID00: {conversation_id}")
+                            
                         # Handle SSE (Server-Sent Events) streaming response
                         if 'text/event-stream' in response.headers.get('content-type', ''):
                             for line in response.iter_lines():

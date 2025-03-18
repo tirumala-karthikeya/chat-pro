@@ -664,3 +664,19 @@ body {
     justify-content: flex-start;
     margin-bottom: 8px;
 }
+
+/* API Key indicator */
+.api-key-indicator {
+    margin-left: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.api-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    display: inline-block;
+    margin-right: 5px;
+}

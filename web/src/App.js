@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
 import './App.css';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -6,11 +7,14 @@ import remarkGfm from 'remark-gfm';
 const ws_url = 'ws://localhost:8001/ws';
 
 function App() {
+    // Get URL parameters
+    const { name, uniqueId } = useParams();
+    
     const [messages, setMessages] = useState([]);
     const [socket, setSocket] = useState(null);
     const [inputMessage, setInputMessage] = useState('');
     const [conversationId, setConversationId] = useState('');
-    const [minimized, setMinimized] = useState(true); // Start minimized
+    const [minimized, setMinimized] = useState(false); // Don't start minimized in standalone mode
     const [showMenu, setShowMenu] = useState(false);
     const [isListening, setIsListening] = useState(false);
     const menuRef = useRef(null);
@@ -24,13 +28,111 @@ function App() {
     const lastMessageIdRef = useRef(null);
     const currentBotResponseRef = useRef("");
     const [isThinking, setIsThinking] = useState(false);
+    
+    // Add state for configuration
+    const [config, setConfig] = useState({
+        chatLogoColor: '#3884db',
+        chatLogoImage: '/logo.png',
+        iconAvatarImage: '/assistance.jpg',
+        staticImage: '/name.jpg',
+        chatHeaderColor: '#b4c7c5',
+        chatBgGradientStart: '#ffffff',
+        chatBgGradientEnd: '#6398d5',
+        bodyBackgroundImage: '',
+        welcomeText: 'Welcome to our assistant! How can I help you today?',
+        apiKey: '',
+        name: 'Assistant',
+        uniqueId: ''
+    });
+
+    // Load configuration at startup - from URL params or sessionStorage
+    useEffect(() => {
+        // First check if there's a bot config in sessionStorage
+        const selectedChatbot = sessionStorage.getItem('selectedChatbot');
+        
+        if (selectedChatbot) {
+            try {
+                const botConfig = JSON.parse(selectedChatbot);
+                // Verify this is the correct bot using URL params
+                if (!uniqueId || botConfig.uniqueId === uniqueId) {
+                    setConfig(botConfig);
+                    console.log('Loaded bot config from session storage');
+                    return;
+                }
+            } catch (e) {
+                console.error('Error parsing chatbot config:', e);
+            }
+        }
+        
+        // If we reach here, try to load from localStorage using URL params
+        if (uniqueId) {
+            const savedChatbots = localStorage.getItem('chatbots');
+            if (savedChatbots) {
+                try {
+                    const bots = JSON.parse(savedChatbots);
+                    const matchedBot = bots.find(bot => bot.uniqueId === uniqueId);
+                    if (matchedBot) {
+                        setConfig(matchedBot);
+                        console.log('Loaded bot config from localStorage using URL params');
+                        return;
+                    }
+                } catch (e) {
+                    console.error('Error finding chatbot by URL params:', e);
+                }
+            }
+        }
+        
+        console.log('Using default bot configuration');
+    }, [uniqueId]);
+
+    // Apply configuration to CSS variables
+    useEffect(() => {
+        document.documentElement.style.setProperty('--chat-logo-color', config.chatLogoColor);
+        document.documentElement.style.setProperty('--chat-header-color', config.chatHeaderColor);
+        document.documentElement.style.setProperty('--chat-bg-gradient-start', config.chatBgGradientStart);
+        document.documentElement.style.setProperty('--chat-bg-gradient-end', config.chatBgGradientEnd);
+        
+        // Set body background image if provided
+        if (config.bodyBackgroundImage) {
+            document.documentElement.style.setProperty('--body-bg-image', `url("${config.bodyBackgroundImage}")`);
+        } else {
+            document.documentElement.style.setProperty('--body-bg-image', 'none');
+        }
+        
+        // Update title with chatbot name
+        document.title = config.name || 'Chatbot';
+    }, [config]);
+    
+    // Initialize chat with welcome message
+    useEffect(() => {
+        if (config.welcomeText) {
+            setMessages([
+                { content: config.welcomeText, id: Date.now(), sender: 'bot' }
+            ]);
+        }
+    }, [config.welcomeText]);
 
     // Initialize and handle WebSocket connection
     useEffect(() => {
-        const ws = new WebSocket(`${ws_url}/abc-123`);
+        if (!config.apiKey) {
+            console.warn("No API key configured, chat functionality will be limited");
+            return;
+        }
+        
+        // For WebSocket connection, we'll use client_id in the URL for compatibility
+        // and pass the API key in the messages
+        const clientId = `client-${Date.now()}`;
+        const ws = new WebSocket(`ws://localhost:8001/ws/${clientId}`);
         
         ws.onopen = () => {
             console.log('WebSocket connection established');
+            
+            // Send an initial message with the API key to set it up
+            const initMessage = {
+                api_key: config.apiKey,
+                type: "init"
+            };
+            ws.send(JSON.stringify(initMessage));
         };
 
         ws.onmessage = (event) => {
@@ -95,11 +197,11 @@ function App() {
         setSocket(ws);
 
         return () => {
-            if (ws) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
                 ws.close();
             }
         };
-    }, []);
+    }, [config.apiKey]);
 
     // Auto-resize the input text area and scroll to bottom
     useEffect(() => {
@@ -137,35 +239,38 @@ function App() {
 
     // Send a message to the WebSocket server
     const sendMessage = () => {
-        if (socket && socket.readyState === WebSocket.OPEN && inputMessage.trim() !== '') {
-            const message = {
-                query: inputMessage,
-                conversation_id: conversationId,
-            };
-
-            setMessages(prevMessages => [
-                ...prevMessages,
-                { content: inputMessage, id: Date.now(), sender: 'user' }
-            ]);
-
-            // Show thinking indicator before sending the message
-            setIsThinking(true);
-
-            socket.send(JSON.stringify(message));
-            setInputMessage('');
-            
-            // If the microphone is currently on, turn it off after sending the message
-            if (isListening) {
-                stopListening();
-            }
-            
-            // Reset the input height after sending
-            if (inputRef.current) {
-                inputRef.current.style.height = 'auto';
-            }
-        } else {
+        if (!socket || socket.readyState !== WebSocket.OPEN || inputMessage.trim() === '') {
             console.error('WebSocket is not open or message is empty');
+            return;
         }
+
+        const message = {
+            query: inputMessage,
+            conversation_id: conversationId,
+            api_key: config.apiKey  // Include the API key in every message
+        };
+
+        setMessages(prevMessages => [
+            ...prevMessages,
+            { content: inputMessage, id: Date.now(), sender: 'user' }
+        ]);
+
+        // Show thinking indicator
+        setIsThinking(true);
+        
+        socket.send(JSON.stringify(message));
+        setInputMessage('');
+        
+        // If the microphone is currently on, turn it off
+        if (isListening) {
+            stopListening();
+        }
+        
+        if (inputRef.current) {
+            inputRef.current.style.height = 'auto';
+        }
+
+        scrollToBottom();
     };
 
     // Handle Enter key press
@@ -183,24 +288,21 @@ function App() {
 
     // Modify the reset chat function to preserve welcome message
     const resetChat = () => {
-        // Keep only the welcome message
         setMessages([
-            { content: "Welcome to our assistant! How can I help you today?", id: Date.now(), sender: 'bot' }
+            { content: config.welcomeText, id: Date.now(), sender: 'bot' }
         ]);
         
-        // Reset conversation ID
         setConversationId('');
-        
-        // Clear any pending bot response
         setBotResponse("");
         setIsReceivingMessage(false);
-        
-        // Close menu
         setShowMenu(false);
         
-        // Notify server of reset
+        // Notify server of reset with the API key
         if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify({ reset: true }));
+            socket.send(JSON.stringify({ 
+                reset: true,
+                api_key: config.apiKey
+            }));
         }
     };
 
@@ -290,41 +392,17 @@ function App() {
         resetChat();
     }, []);
 
-    // Add this effect to set CSS variables from environment variables
-    useEffect(() => {
-        // Set CSS variables from environment variables
-        document.documentElement.style.setProperty('--chat-logo-color', 
-            process.env.REACT_APP_CHAT_LOGO_COLOR || '#3884db');
-        document.documentElement.style.setProperty('--chat-header-color', 
-            process.env.REACT_APP_CHAT_HEADER_COLOR || '#ffffff');
-        document.documentElement.style.setProperty('--chat-bg-gradient-start', 
-            process.env.REACT_APP_CHAT_BG_GRADIENT_START || '#6398d5');
-        document.documentElement.style.setProperty('--chat-bg-gradient-end', 
-            process.env.REACT_APP_CHAT_BG_GRADIENT_END || '#ffffff');
-        
-        // Set body background image properly with a check if it exists
-        if (process.env.REACT_APP_BODY_BG_IMAGE) {
-            document.documentElement.style.setProperty('--body-bg-image', `url("${process.env.REACT_APP_BODY_BG_IMAGE}")`);
-        } else {
-            // If no environment variable is set, we can either:
-            // 1. Leave it as 'none' which will use the background-color
-            // 2. Set a default image if you have one in your public folder
-            
-            // Option 1: Use no image (will show the background color)
-            document.documentElement.style.setProperty('--body-bg-image', 'url("/background.jpg")');
-            
-            // Option 2: If you have a default image in public folder:
-            // document.documentElement.style.setProperty('--body-bg-image', 'url("/default-bg.jpg")');
-        }
-    }, []);
-
     return (
         <div className={`chat-container ${minimized ? 'minimized' : ''}`}>
             <div className="chat-position-wrapper">
                 <div className="chat-logo" onClick={toggleMinimize}>
                     <img 
-                        src={process.env.REACT_APP_CHAT_LOGO_IMAGE || "/logo.png"} 
+                        src={config.chatLogoImage || "/logo.png"} 
                         alt="Chat Logo" 
+                        onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = "/logo.png"; // Fallback if image cannot be loaded
+                        }}
                     />
                 </div>
                 
@@ -333,15 +411,23 @@ function App() {
                         <div className="chat-header">
                             <div className="avatar">
                                 <img 
-                                    src={process.env.REACT_APP_AVATAR_IMAGE || "/assistance.jpg"} 
-                                    alt="Bot Avatar" 
+                                    src={config.iconAvatarImage || "/assistance.jpg"} 
+                                    alt="Bot Avatar"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = "/assistance.jpg"; // Fallback
+                                    }}
                                 />
                             </div>
                             <div className="chat-options">
                                 <div className="static-image">
                                     <img 
-                                        src={process.env.REACT_APP_STATIC_IMAGE || "/name.jpg"} 
-                                        alt="Static Image" 
+                                        src={config.staticImage || "/name.jpg"} 
+                                        alt="Static Image"
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = "/name.jpg"; // Fallback
+                                        }}
                                     />
                                 </div>
                             </div>
@@ -360,6 +446,9 @@ function App() {
                                 )}
                             </div>
                             <button className="close-button" onClick={toggleMinimize}>×</button>
+                            <div className="api-key-indicator" title={`Using API Key: ${config.apiKey}`}>
+                                <span className="api-dot"></span>
+                            </div>
                         </div>
                         
                         <div className="chat-content-area">
