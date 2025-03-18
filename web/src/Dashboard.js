@@ -152,8 +152,12 @@ function Dashboard() {
 
     // Get the full URL for the chatbot
     const getChatbotFullUrl = (bot) => {
-        // Get the current hostname (e.g., localhost:3000 or your production domain)
-        const baseUrl = window.location.origin;
+        // Use production domain for QR codes and links
+        const isProd = process.env.NODE_ENV === 'production';
+        const baseUrl = isProd 
+            ? 'https://agentics.xpectrum-ai.com' 
+            : window.location.origin;
+            
         return `${baseUrl}/chatbot/${encodeURIComponent(bot.name)}/${bot.uniqueId}`;
     };
 
