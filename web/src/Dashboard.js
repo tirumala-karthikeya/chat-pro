@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import QRCode from 'react-qr-code';
 import './Dashboard.css';
 
 function Dashboard() {
     const [chatbots, setChatbots] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [visibleQRCodes, setVisibleQRCodes] = useState({});
     const [currentBot, setCurrentBot] = useState({
         id: '',
         name: '',
@@ -148,6 +150,67 @@ function Dashboard() {
         }
     };
 
+    // Get the full URL for the chatbot
+    const getChatbotFullUrl = (bot) => {
+        // Get the current hostname (e.g., localhost:3000 or your production domain)
+        const baseUrl = window.location.origin;
+        return `${baseUrl}/chatbot/${encodeURIComponent(bot.name)}/${bot.uniqueId}`;
+    };
+
+    // Toggle QR code visibility for a specific chatbot
+    const toggleQRCode = (botId) => {
+        setVisibleQRCodes(prev => ({
+            ...prev,
+            [botId]: !prev[botId]
+        }));
+    };
+
+    // Function to download QR code as an image
+    const downloadQRCode = (bot) => {
+        const qrCodeElement = document.getElementById(`qr-code-${bot.id}`);
+        
+        if (!qrCodeElement) return;
+        
+        // Create a canvas element
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        
+        // Set canvas size (make it a bit larger to include padding)
+        const size = 180;
+        canvas.width = size;
+        canvas.height = size;
+        
+        // Fill with white background
+        context.fillStyle = 'white';
+        context.fillRect(0, 0, size, size);
+        
+        // Create a new image from the QR code SVG
+        const image = new Image();
+        
+        // Convert SVG to data URL
+        const svgData = new XMLSerializer().serializeToString(qrCodeElement);
+        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
+        
+        image.onload = () => {
+            // Draw image in the center of the canvas
+            context.drawImage(image, 15, 15, size - 30, size - 30);
+            
+            // Create download link
+            const link = document.createElement('a');
+            link.download = `${bot.name}-qrcode.png`;
+            link.href = canvas.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Clean up
+            URL.revokeObjectURL(url);
+        };
+        
+        image.src = url;
+    };
+
     const launchChatbot = (bot) => {
         // Store the selected bot in sessionStorage
         sessionStorage.setItem('selectedChatbot', JSON.stringify(bot));
@@ -229,6 +292,30 @@ function Dashboard() {
                                             <div className="url-label">Unique URL:</div>
                                             <div className="url-value">/chatbot/{bot.name}/{bot.uniqueId.substring(0, 5)}...</div>
                                         </div>
+                                        
+                                        {visibleQRCodes[bot.id] && (
+                                            <div className="qr-code-container">
+                                                <QRCode 
+                                                    id={`qr-code-${bot.id}`}
+                                                    value={getChatbotFullUrl(bot)}
+                                                    size={150}
+                                                    level="H"
+                                                    className="chatbot-qr-code"
+                                                />
+                                                <p className="qr-code-instruction">Scan to access chatbot</p>
+                                                <button 
+                                                    onClick={() => downloadQRCode(bot)} 
+                                                    className="download-qr-button"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                                        <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                                                    </svg>
+                                                    Download QR
+                                                </button>
+                                            </div>
+                                        )}
+                                        
                                         <div className="card-preview">
                                             <div className="preview-item">
                                                 <span className="preview-label">Header:</span>
@@ -251,6 +338,12 @@ function Dashboard() {
                                                 <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
                                             </svg>
                                             Edit
+                                        </button>
+                                        <button onClick={() => toggleQRCode(bot.id)} className="qr-code-button">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M0 .5A.5.5 0 0 1 .5 0h3a.5.5 0 0 1 0 1H1v2.5a.5.5 0 0 1-1 0v-3Zm12 0a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0V1h-2.5a.5.5 0 0 1-.5-.5ZM.5 12a.5.5 0 0 1 .5.5V15h2.5a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5Zm15 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1 0-1H15v-2.5a.5.5 0 0 1 .5-.5ZM4 4h1v1H4V4Zm2 0h1v1H6V4Zm1 2v1H6V6h1Zm0 2H6v1h1V8ZM6 2h1v1H6V2Zm0 8h1v1H6v-1ZM4 2h1v1H4V2Zm0 8h1v1H4v-1Zm6-8h1v1h-1V2Zm0 3h1v1h-1V5Zm0 3h1v1h-1V8Zm0 3h1v1h-1v-1Zm3-6h1v1h-1V5Zm0 3h1v1h-1V8ZM9 2h1v1H9V2Zm0 8h1v1H9v-1Zm3-6h1v1h-1V4Zm1-2h1v1h-1V2Zm0 8h1v1h-1v-1Z"/>
+                                            </svg>
+                                            {visibleQRCodes[bot.id] ? 'Hide QR' : 'Show QR'}
                                         </button>
                                         <button onClick={() => window.open(bot.analyticsUrl, '_blank')} className="analytics-button">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
