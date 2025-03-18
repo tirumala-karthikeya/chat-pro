@@ -392,6 +392,42 @@ function App() {
         resetChat();
     }, []);
 
+    // Add this function in your App component
+    useEffect(() => {
+        // Function to handle image click for full-size viewing
+        const handleImageClick = (e) => {
+            if (e.target.tagName === 'IMG' && e.target.parentNode.className === 'message-content') {
+                // Create modal or open image in new tab
+                window.open(e.target.src, '_blank');
+            }
+        };
+
+        // Add event listener
+        document.addEventListener('click', handleImageClick);
+
+        // Clean up
+        return () => {
+            document.removeEventListener('click', handleImageClick);
+        };
+    }, []);
+
+    // Also add this to the ReactMarkdown components to process images properly
+    const imageRenderer = ({ src, alt }) => {
+        return (
+            <img 
+                src={src} 
+                alt={alt || "Image"} 
+                className={src.includes('large') ? 'large-image' : ''}
+                onLoad={(e) => {
+                    // Check if image is large and add appropriate class
+                    if (e.target.naturalWidth > 400 || e.target.naturalHeight > 400) {
+                        e.target.classList.add('large-image');
+                    }
+                }}
+            />
+        );
+    };
+
     return (
         <div className={`chat-container ${minimized ? 'minimized' : ''}`}>
             <div className="chat-position-wrapper">
@@ -463,7 +499,12 @@ function App() {
                                                 </div>
                                             )}
                                             <div className="message-content">
-                                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                <ReactMarkdown 
+                                                    remarkPlugins={[remarkGfm]}
+                                                    components={{
+                                                        img: imageRenderer
+                                                    }}
+                                                >
                                                     {message.content || "\u00A0"}
                                                 </ReactMarkdown>
                                             </div>
@@ -489,7 +530,12 @@ function App() {
                                     <div className="message-wrapper bot-wrapper">
                                         <div className="message bot-message streaming">
                                             <div className="message-content">
-                                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                <ReactMarkdown 
+                                                    remarkPlugins={[remarkGfm]}
+                                                    components={{
+                                                        img: imageRenderer
+                                                    }}
+                                                >
                                                     {botResponse || "\u00A0"}
                                                 </ReactMarkdown>
                                             </div>
