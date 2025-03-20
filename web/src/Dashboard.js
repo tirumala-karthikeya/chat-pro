@@ -34,17 +34,67 @@ function Dashboard() {
         bot.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // Function to safely save to localStorage with error handling
+    const safeSetLocalStorage = (key, value) => {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+        } catch (e) {
+            if (e.name === 'QuotaExceededError') {
+                console.warn('LocalStorage quota exceeded, attempting cleanup...');
+                cleanupLocalStorage();
+                // Try one more time after cleanup
+                try {
+                    localStorage.setItem(key, JSON.stringify(value));
+                } catch (retryError) {
+                    console.error('Failed to save after cleanup:', retryError);
+                    // Fallback to sessionStorage for temporary storage
+                    sessionStorage.setItem(key, JSON.stringify(value));
+                }
+            } else {
+                console.error('Error saving to localStorage:', e);
+                // Fallback to sessionStorage
+                sessionStorage.setItem(key, JSON.stringify(value));
+            }
+        }
+    };
+
+    // Function to clean up localStorage when it's full
+    const cleanupLocalStorage = () => {
+        try {
+            // Get all chatbots
+            const savedChatbots = localStorage.getItem('chatbots');
+            if (savedChatbots) {
+                const bots = JSON.parse(savedChatbots);
+                // Keep only the most recent 5 chatbots
+                const recentBots = bots.slice(-5);
+                localStorage.setItem('chatbots', JSON.stringify(recentBots));
+                console.log('Cleaned up localStorage, kept most recent 5 chatbots');
+            }
+        } catch (e) {
+            console.error('Error during localStorage cleanup:', e);
+        }
+    };
+
     useEffect(() => {
         // Load saved chatbots from localStorage
-        const savedChatbots = localStorage.getItem('chatbots');
-        if (savedChatbots) {
-            setChatbots(JSON.parse(savedChatbots));
+        try {
+            const savedChatbots = localStorage.getItem('chatbots');
+            if (savedChatbots) {
+                setChatbots(JSON.parse(savedChatbots));
+            }
+        } catch (e) {
+            console.error('Error loading chatbots from localStorage:', e);
+            // Try to load from sessionStorage as fallback
+            const sessionChatbots = sessionStorage.getItem('chatbots');
+            if (sessionChatbots) {
+                setChatbots(JSON.parse(sessionChatbots));
+            }
         }
     }, []);
 
     // Save chatbots to localStorage whenever they change
     useEffect(() => {
-        localStorage.setItem('chatbots', JSON.stringify(chatbots));
+        safeSetLocalStorage('chatbots', chatbots);
     }, [chatbots]);
 
     const handleInputChange = (e) => {

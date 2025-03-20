@@ -3,10 +3,32 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>React App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#3884db" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Chat Assistant" />
+    <meta name="description" content="AI Chat Assistant" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>Chat Assistant</title>
+    <style>
+      /* Prevent overscroll behavior */
+      html, body {
+        overscroll-behavior: none;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f2f5;
+      }
+      #root {
+        height: 100%;
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div> <!-- Make sure this exists -->
+    <div id="root"></div>
   </body>
 </html>

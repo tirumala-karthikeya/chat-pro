@@ -14,7 +14,7 @@ function App() {
     const [socket, setSocket] = useState(null);
     const [inputMessage, setInputMessage] = useState('');
     const [conversationId, setConversationId] = useState('');
-    const [minimized, setMinimized] = useState(false); // Don't start minimized in standalone mode
+    const [minimized, setMinimized] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
     const [isListening, setIsListening] = useState(false);
     const menuRef = useRef(null);
@@ -42,7 +42,8 @@ function App() {
         welcomeText: 'Welcome to our assistant! How can I help you today?',
         apiKey: '',
         name: 'Assistant',
-        uniqueId: ''
+        uniqueId: '',
+        analyticsUrl: 'http://localhost:8088/superset/dashboard/1/?native_filters_key=Fa1TCGahXdiVfZhNjZrPy3B1jZ9yTguoXRkKKmBPW9w88GDy2Qc7wuFXjlp8oNtK'
     });
 
     // Load configuration at startup - from URL params or sessionStorage
@@ -66,9 +67,9 @@ function App() {
         
         // If we reach here, try to load from localStorage using URL params
         if (uniqueId) {
-            const savedChatbots = localStorage.getItem('chatbots');
-            if (savedChatbots) {
-                try {
+            try {
+                const savedChatbots = localStorage.getItem('chatbots');
+                if (savedChatbots) {
                     const bots = JSON.parse(savedChatbots);
                     const matchedBot = bots.find(bot => bot.uniqueId === uniqueId);
                     if (matchedBot) {
@@ -76,14 +77,57 @@ function App() {
                         console.log('Loaded bot config from localStorage using URL params');
                         return;
                     }
-                } catch (e) {
-                    console.error('Error finding chatbot by URL params:', e);
                 }
+            } catch (e) {
+                console.error('Error accessing localStorage:', e);
+                // If localStorage is full or inaccessible, try to clean it up
+                cleanupLocalStorage();
             }
         }
         
         console.log('Using default bot configuration');
     }, [uniqueId]);
+
+    // Function to safely save to localStorage with error handling
+    const safeSetLocalStorage = (key, value) => {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+        } catch (e) {
+            if (e.name === 'QuotaExceededError') {
+                console.warn('LocalStorage quota exceeded, attempting cleanup...');
+                cleanupLocalStorage();
+                // Try one more time after cleanup
+                try {
+                    localStorage.setItem(key, JSON.stringify(value));
+                } catch (retryError) {
+                    console.error('Failed to save after cleanup:', retryError);
+                    // Fallback to sessionStorage for temporary storage
+                    sessionStorage.setItem(key, JSON.stringify(value));
+                }
+            } else {
+                console.error('Error saving to localStorage:', e);
+                // Fallback to sessionStorage
+                sessionStorage.setItem(key, JSON.stringify(value));
+            }
+        }
+    };
+
+    // Function to clean up localStorage when it's full
+    const cleanupLocalStorage = () => {
+        try {
+            // Get all chatbots
+            const savedChatbots = localStorage.getItem('chatbots');
+            if (savedChatbots) {
+                const bots = JSON.parse(savedChatbots);
+                // Keep only the most recent 5 chatbots
+                const recentBots = bots.slice(-5);
+                localStorage.setItem('chatbots', JSON.stringify(recentBots));
+                console.log('Cleaned up localStorage, kept most recent 5 chatbots');
+            }
+        } catch (e) {
+            console.error('Error during localStorage cleanup:', e);
+        }
+    };
 
     // Apply configuration to CSS variables
     useEffect(() => {
@@ -477,7 +521,7 @@ function App() {
                                 {showMenu && (
                                     <div className="menu-dropdown">
                                         <button onClick={resetChat}>Reset Chat</button>
-                                        <a href="http://localhost:8088/superset/dashboard/1/?native_filters_key=Fa1TCGahXdiVfZhNjZrPy3B1jZ9yTguoXRkKKmBPW9w88GDy2Qc7wuFXjlp8oNtK" target="_blank" rel="noopener noreferrer">Analytics</a>
+                                        <a href={config.analyticsUrl} target="_blank" rel="noopener noreferrer">Analytics</a>
                                     </div>
                                 )}
                             </div>
@@ -502,7 +546,10 @@ function App() {
                                                 <ReactMarkdown 
                                                     remarkPlugins={[remarkGfm]}
                                                     components={{
-                                                        img: imageRenderer
+                                                        img: imageRenderer,
+                                                        p: ({children}) => <p className="markdown-paragraph">{children}</p>,
+                                                        code: ({children}) => <code className="markdown-code">{children}</code>,
+                                                        pre: ({children}) => <pre className="markdown-pre">{children}</pre>
                                                     }}
                                                 >
                                                     {message.content || "\u00A0"}
@@ -533,7 +580,10 @@ function App() {
                                                 <ReactMarkdown 
                                                     remarkPlugins={[remarkGfm]}
                                                     components={{
-                                                        img: imageRenderer
+                                                        img: imageRenderer,
+                                                        p: ({children}) => <p className="markdown-paragraph">{children}</p>,
+                                                        code: ({children}) => <code className="markdown-code">{children}</code>,
+                                                        pre: ({children}) => <pre className="markdown-pre">{children}</pre>
                                                     }}
                                                 >
                                                     {botResponse || "\u00A0"}
@@ -554,6 +604,7 @@ function App() {
                                     onKeyPress={handleKeyPress}
                                     placeholder="Type a message..."
                                     rows="1"
+                                    className="chat-textarea"
                                 />
                                 <div className="input-buttons">
                                     <button 
