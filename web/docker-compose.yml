@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  # Frontend React application
+  frontend:
+    image: chatbot-app:latest
+    container_name: chatbot_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    restart: always
+    networks:
+      - chatbot-network
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+
+  # Backend API service
+  api:
+    image: chatbot-app:latest
+    container_name: chatbot_api
+    command: cd /app/api && python -m uvicorn main:app --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./api.env:/app/api/.env
+    depends_on:
+      - postgres
+    restart: always
+    networks:
+      - chatbot-network
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=chatbot_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  # PostgreSQL database
+  postgres:
+    image: postgres:15-alpine
+    container_name: chatbot_postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=chatbot_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - chatbot-network
+
+networks:
+  chatbot-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local 

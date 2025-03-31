@@ -1,0 +1,11 @@
+{
+  "files": {
+    "main.css": "https://agentics.xpectrum-ai.com/static/css/main.b493592e.css",
+    "main.js": "https://agentics.xpectrum-ai.com/static/js/main.6fcd97f2.js",
+    "index.html": "https://agentics.xpectrum-ai.com/index.html"
+  },
+  "entrypoints": [
+    "static/css/main.b493592e.css",
+    "static/js/main.6fcd97f2.js"
+  ]
+}

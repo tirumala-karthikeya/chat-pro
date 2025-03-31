@@ -1,0 +1,1260 @@
+/* Beautiful Dashboard Styles */
+:root {
+    --primary-color: #3884db;
+    --secondary-color: #4a7bbd;
+    --accent-color: #64d2ff;
+    --light-color: #f8faff;
+    --dark-color: #1e2a3a;
+    --text-color: #333;
+    --border-radius: 10px;
+    --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    --transition: all 0.3s ease;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-color);
+    color: var(--text-color);
+}
+
+/* Background with aesthetic pattern */
+.dashboard-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.dashboard-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #f0f4f9;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%233884db' fill-opacity='0.03'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    z-index: -1;
+}
+
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    flex: 1;
+}
+
+/* Header with company logo and search */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    flex-wrap: wrap;
+    gap: 20px;
+    background: linear-gradient(120deg, #f6f8fa, #ffffff);
+    animation: gradientShift 8s ease infinite;
+    padding: 20px;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.company-logo {
+    margin-right: 16px;
+    width: 200px;
+    height: 40px;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.company-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dashboard-header h1 {
+    color: var(--dark-color);
+    font-size: 28px;
+    margin: 0;
+    font-weight: 600;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* Beautiful search bar */
+.search-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-bar input {
+    padding: 10px 20px 10px 40px;
+    border-radius: 30px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    width: 250px;
+    max-width: 100%;
+    font-size: 15px;
+    background-color: white;
+    transition: var(--transition);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.search-bar input:focus {
+    outline: none;
+    box-shadow: 0 2px 15px rgba(56, 132, 219, 0.15);
+    border-color: var(--primary-color);
+}
+
+.search-bar svg {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
+
+/* Create Button */
+.create-button {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 30px;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(56, 132, 219, 0.2);
+}
+
+.create-button span {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.create-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(56, 132, 219, 0.3);
+}
+
+/* Dashboard content */
+.dashboard-content {
+    margin-bottom: 40px;
+}
+
+/* Empty state */
+.no-chatbots {
+    background-color: white;
+    padding: 60px;
+    text-align: center;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    margin: 40px auto;
+    max-width: 500px;
+}
+
+.no-chatbots p {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.create-first-button {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(56, 132, 219, 0.2);
+    font-weight: 500;
+}
+
+.create-first-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(56, 132, 219, 0.3);
+}
+
+/* Chatbot cards */
+.chatbots-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.chatbots-grid .chatbot-card:nth-child(1) { animation-delay: 0.1s; }
+.chatbots-grid .chatbot-card:nth-child(2) { animation-delay: 0.2s; }
+.chatbots-grid .chatbot-card:nth-child(3) { animation-delay: 0.3s; }
+.chatbots-grid .chatbot-card:nth-child(4) { animation-delay: 0.4s; }
+.chatbots-grid .chatbot-card:nth-child(5) { animation-delay: 0.5s; }
+.chatbots-grid .chatbot-card:nth-child(6) { animation-delay: 0.6s; }
+
+.chatbot-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+    overflow: hidden;
+}
+
+.chatbot-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 20px rgba(56, 132, 219, 0.15);
+}
+
+.card-header {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.chatbot-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    margin-bottom: 5px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+.chatbot-logo:hover {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.chatbot-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.default-logo {
+    color: white;
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.chatbot-card h3 {
+    margin: 0;
+    text-align: center;
+    font-size: 18px;
+    color: var(--dark-color);
+    font-weight: 600;
+}
+
+.card-content {
+    padding: 15px 20px;
+    flex: 1;
+}
+
+.unique-url {
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+    word-break: break-all;
+    padding: 0 10px;
+}
+
+.card-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+    padding: 10px 15px 15px;
+}
+
+.card-actions button {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.card-actions button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-actions button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.card-actions button:active::after {
+    width: 200%;
+    height: 200%;
+}
+
+.card-actions button:nth-child(3) {
+    background-color: #3884db;
+    color: white;
+    border: none;
+}
+
+.card-actions button:nth-child(3):hover {
+    background-color: #2a6cb7;
+}
+
+/* Form overlay */
+.form-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 15px;
+}
+
+.form-container {
+    background-color: white;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 30px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
+.form-container h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #555;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-group textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.color-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.color-input input[type="color"] {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.color-input input[type="text"] {
+    flex: 1;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.save-button,
+.cancel-button {
+    padding: 10px 25px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.save-button {
+    background-color: #3884db;
+    color: white;
+    border: none;
+}
+
+.save-button:hover {
+    background-color: #2a6cb7;
+}
+
+.cancel-button {
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.cancel-button:hover {
+    background-color: #e5e5e5;
+}
+
+/* Add these styles to your existing Dashboard.css */
+.file-input-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.file-input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.file-input-label {
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    transition: background-color 0.2s;
+}
+
+.file-input-label:hover {
+    background-color: #e0e0e0;
+}
+
+.file-name {
+    font-size: 14px;
+    color: #666;
+}
+
+.image-preview {
+    margin-top: 10px;
+    max-width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+
+.image-preview img {
+    max-width: 100%;
+    max-height: 120px;
+    display: block;
+}
+
+.analytics-button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    background-color: #4c94e9;
+    color: black;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.analytics-button:hover {
+    background-color: #3a7fd6;
+    transform: translateY(-1px);
+}
+
+.analytics-button svg {
+    opacity: 0.9;
+}
+
+.form-help {
+    display: block;
+    margin-top: 4px;
+    color: #666;
+    font-size: 12px;
+}
+
+/* QR Code Styles */
+.qr-code-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.chatbot-qr-code {
+    padding: 10px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    max-width: 100%;
+    height: auto;
+}
+
+.qr-code-instruction {
+    font-size: 12px;
+    color: #666;
+    margin: 5px 0 0;
+    text-align: center;
+}
+
+.qr-code-button {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    background-color: #f0f5ff;
+    color: var(--primary-color);
+    border: 1px solid rgba(56, 132, 219, 0.3);
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.qr-code-button:hover {
+    background-color: #e1ebff;
+    transform: translateY(-1px);
+}
+
+.qr-code-button svg {
+    opacity: 0.9;
+}
+
+/* Download QR button */
+.download-qr-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    margin-top: 10px;
+    background-color: #ffffff;
+    color: var(--primary-color);
+    border: 1px solid rgba(56, 132, 219, 0.3);
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.download-qr-button:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(56, 132, 219, 0.2);
+}
+
+.download-qr-button svg {
+    transition: all 0.2s ease;
+}
+
+.download-qr-button:hover svg {
+    fill: white;
+}
+
+/* Add the new loading and error styles after the dashboard-content style */
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.1); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+.error-message {
+    background-color: #fff1f0;
+    border: 1px solid #ffccc7;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 20px;
+    text-align: center;
+    color: #cf1322;
+}
+
+.retry-button {
+    background-color: #3884db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    margin-top: 12px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.retry-button:hover {
+    background-color: #2a6db2;
+}
+
+/* Toast Notification */
+.toast-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 6px;
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+               fadeOut 0.5s ease 2.5s forwards;
+    max-width: calc(100% - 40px);
+    margin: 0 20px;
+}
+
+.toast-notification.success {
+    background-color: #4caf50;
+}
+
+.toast-notification.error {
+    background-color: #f44336;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Debug Panel Styles */
+.debug-panel {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: rgba(0, 0, 0, 0.85);
+    color: #00ff00;
+    padding: 15px;
+    border-radius: 5px;
+    z-index: 9999;
+    font-family: monospace;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+    font-size: 14px;
+    max-height: 80vh;
+    overflow-y: auto;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.debug-panel h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #00ff00;
+    padding-bottom: 5px;
+    font-size: 16px;
+}
+
+.debug-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+}
+
+.debug-row span:first-child {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.debug-row span:last-child {
+    word-break: break-all;
+}
+
+.debug-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.debug-actions button {
+    background-color: #333;
+    color: #00ff00;
+    border: 1px solid #00ff00;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+    font-family: monospace;
+}
+
+.debug-actions button:hover {
+    background-color: #00ff00;
+    color: black;
+}
+
+.debug-tip {
+    margin-top: 12px;
+    font-size: 12px;
+    text-align: center;
+    opacity: 0.7;
+}
+
+/* Data Source Indicator Styles */
+.data-source-indicator {
+    display: flex;
+    justify-content: flex-end;
+    padding: 5px 20px;
+    margin-bottom: 10px;
+}
+
+.data-source-indicator.MongoDB {
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+.data-source-indicator.localStorage {
+    background-color: rgba(255, 152, 0, 0.1);
+}
+
+.data-source-indicator.unknown {
+    background-color: rgba(158, 158, 158, 0.1);
+}
+
+.online-badge, .offline-badge, .pending-badge {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.online-badge {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: #2e7d32;
+    border: 1px solid rgba(76, 175, 80, 0.4);
+}
+
+.offline-badge {
+    background-color: rgba(255, 152, 0, 0.2);
+    color: #e65100;
+    border: 1px solid rgba(255, 152, 0, 0.4);
+    padding-right: 6px;
+}
+
+.pending-badge {
+    background-color: rgba(158, 158, 158, 0.2);
+    color: #616161;
+    border: 1px solid rgba(158, 158, 158, 0.4);
+}
+
+.online-badge svg, .offline-badge svg, .pending-badge svg {
+    margin-right: 8px;
+}
+
+.refresh-button {
+    background: none;
+    border: none;
+    margin-left: 8px;
+    cursor: pointer;
+    color: #e65100;
+    display: flex;
+    align-items: center;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.refresh-button:hover {
+    background-color: rgba(255, 152, 0, 0.2);
+}
+
+.refresh-button svg {
+    margin-right: 4px;
+}
+
+/* Refresh indicator */
+.refresh-indicator {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 8px 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 0.85rem;
+    color: #555;
+    z-index: 100;
+    animation: fadeIn 0.3s ease;
+}
+
+.refresh-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ddd;
+    border-top: 2px solid #3884db;
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Media Queries */
+/* Mobile devices (up to 576px) */
+@media screen and (max-width: 576px) {
+    .dashboard-container {
+        padding: 10px;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .header-left {
+        justify-content: center;
+    }
+
+    .header-right {
+        justify-content: center;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .company-logo {
+        width: 150px;
+        height: 30px;
+        margin-right: 0;
+    }
+
+    .search-bar input {
+        width: 100%;
+    }
+
+    .chatbots-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-container {
+        padding: 15px;
+    }
+}
+
+/* Tablet devices (577px to 992px) */
+@media screen and (min-width: 577px) and (max-width: 992px) {
+    .dashboard-container {
+        padding: 15px;
+    }
+
+    .chatbots-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+}
+
+/* Laptop devices (993px to 1200px) */
+@media screen and (min-width: 993px) and (max-width: 1200px) {
+    .chatbots-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+}
+
+/* Large screens (above 1200px) */
+@media screen and (min-width: 1201px) {
+    .chatbots-grid {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
+}
+
+/* QR Code Modal Overlay */
+.qr-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+/* QR Code Modal Content */
+.qr-modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 90%;
+    width: 300px;
+    text-align: center;
+    animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.qr-modal-content .chatbot-qr-code {
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0;
+}
+
+.qr-code-instruction {
+    margin-top: 12px;
+    color: #666;
+    font-size: 14px;
+}
+
+.download-qr-button {
+    margin-top: 12px;
+    background-color: #3884db;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.download-qr-button:hover {
+    background-color: #2a6cb7;
+}
+
+/* Add smooth transitions for all interactive elements */
+* {
+    transition: all 0.3s ease;
+}
+
+/* Enhanced card animations and styling */
+.chatbot-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+    overflow: hidden;
+}
+
+.chatbot-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 20px rgba(56, 132, 219, 0.15);
+}
+
+/* Improved logo animation */
+.chatbot-logo {
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+.chatbot-logo:hover {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Enhanced button animations */
+.card-actions button {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.card-actions button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-actions button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.card-actions button:active::after {
+    width: 200%;
+    height: 200%;
+}
+
+/* Animated gradients for headers */
+.dashboard-header {
+    background: linear-gradient(120deg, #f6f8fa, #ffffff);
+    animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Beautiful loading animation */
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.1); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Fade-in animation for cards */
+.chatbot-card {
+    animation: fadeInUp 0.6s ease backwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Staggered animation for multiple cards */
+.chatbots-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.chatbots-grid .chatbot-card:nth-child(1) { animation-delay: 0.1s; }
+.chatbots-grid .chatbot-card:nth-child(2) { animation-delay: 0.2s; }
+.chatbots-grid .chatbot-card:nth-child(3) { animation-delay: 0.3s; }
+.chatbots-grid .chatbot-card:nth-child(4) { animation-delay: 0.4s; }
+.chatbots-grid .chatbot-card:nth-child(5) { animation-delay: 0.5s; }
+.chatbots-grid .chatbot-card:nth-child(6) { animation-delay: 0.6s; }
+
+/* Enhanced modal animations */
+.qr-modal-overlay {
+    animation: fadeIn 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.qr-modal-content {
+    animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Beautiful button styles */
+.download-qr-button {
+    background: linear-gradient(135deg, #3884db, #2a6cb7);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.download-qr-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(56, 132, 219, 0.3);
+}
+
+/* Toast notification animations */
+.toast-notification {
+    animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+               fadeOut 0.5s ease 2.5s forwards;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Smooth hover transitions for all interactive elements */
+button, a, .chatbot-card, .form-input {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Add subtle hover effect to form inputs */
+.form-input:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Make it responsive */
+@media screen and (max-width: 1200px) {
+    .chatbots-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .chatbots-grid {
+        grid-template-columns: 1fr;
+    }
+} 

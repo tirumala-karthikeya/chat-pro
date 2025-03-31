@@ -1,0 +1,1019 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    backface-visibility: hidden;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    animation-duration: 0s !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+}
+
+/* Add CSS variables at the root */
+:root {
+    --chat-logo-color: #3884db;
+    --chat-header-color: #b4c7c5;
+    --chat-bg-gradient-start: #ffffff;
+    --chat-bg-gradient-end: #6398d5;
+    --chat-main-bg-color: #e9f0f7; /* New solid color for chat background */
+    --body-bg-image: none; /* Default to none, will be set via JS */
+}
+
+body {
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f2f5; /* Fallback color if no image */
+    background-image: var(--body-bg-image);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+/* Container for both minimized and expanded states */
+.chat-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    border-radius: 60px;
+}
+
+
+.chat-position-wrapper {
+    position: relative;
+}
+
+/* Minimized circular logo */
+.chat-container.minimized {
+    width: 60px;
+    height: 60px;
+}
+
+.chat-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--chat-logo-color);
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+}
+
+.chat-logo:hover {
+    transform: scale(1.05);
+}
+
+.chat-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Expanded chat view */
+.chat-expanded {
+    position: absolute;
+    bottom: 65px;
+    right: 0;
+    width: 520px;
+    height: 600px;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    background-color: transparent;
+    overflow: hidden;
+    border: none;
+}
+
+.chat-header {
+    padding: 8px 15px;
+    background-color: var(--chat-header-color);
+    height: 60px;
+    color: rgba(255, 255, 255, 0.582);
+    display: flex;
+    align-items: center;
+}
+
+.avatar {
+    margin-right: 5px;
+}
+
+.avatar img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.chat-options {
+    flex-grow: 1;
+}
+
+.image-upload-btn {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.image-upload-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.chat-controls {
+    position: relative;
+    margin-right: 10px;
+}
+
+.menu-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 0 5px;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0 5px;
+}
+
+.menu-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    min-width: 150px;
+    z-index: 10;
+}
+
+.menu-dropdown button,
+.menu-dropdown a {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 15px;
+    border: none;
+    background: none;
+    color: #333;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.menu-dropdown button:hover,
+.menu-dropdown a:hover {
+    background-color: #f5f5f5;
+}
+
+/* Add a wrapper for the content area below the header */
+.chat-content-area {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    background: linear-gradient(135deg, var(--chat-bg-gradient-start) 0%, var(--chat-bg-gradient-end) 100%);
+    background-size: cover;
+    border-radius: 00px;
+    overflow: hidden;
+}
+
+/* Update the chat messages to be transparent */
+.chat-messages {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    background: transparent;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-bottom: none;
+    transform: translateZ(0);
+    will-change: transform;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Clean up the overlay pattern if you want to keep it */
+.chat-messages::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+    opacity: 0.3;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.message-wrapper {
+    display: flex;
+    width: 100%;
+    margin-bottom: 6px;
+}
+
+.user-wrapper {
+    justify-content: flex-end;
+}
+
+.bot-wrapper {
+    justify-content: flex-start;
+    min-width: 85%;
+    position: relative;
+    transition: none;
+}
+
+.message {
+    padding: 8px 12px;
+    border-radius: 20px;
+    max-width: 85%;
+    word-wrap: break-word;
+    margin-bottom: 6px;
+    position: relative;
+    min-height: 35px;
+    box-sizing: border-box;
+}
+
+.user-message {
+    background-color: #5d9fb5;
+    color: #000;
+    align-self: flex-end;
+    margin-left: auto;
+    border-radius: 18px;
+}
+
+.bot-message {
+    background-color: #f5f5f5;
+    color: #000;
+    align-self: flex-start;
+    margin-right: auto;
+    border-radius: 18px;
+    min-width: 300px;
+    width: 92%;
+    box-sizing: border-box;
+    transform: translateZ(0);
+    transition: none !important;
+    position: relative;
+}
+
+.message-content {
+    position: relative;
+    min-width: 60px;
+    min-height: 20px;
+    transform: translateZ(0);
+    will-change: contents;
+    transition: none !important;
+    white-space: pre-wrap;
+    word-break: break-word;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Improve Markdown styling for both message types */
+.message-content {
+    min-width: 40px;
+}
+
+/* Ensure code blocks are properly styled */
+.message-content pre {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 8px;
+    border-radius: 4px;
+    overflow-x: hidden;
+    margin: 8px 0;
+    font-family: monospace;
+    font-size: 13px;
+    &:hover {
+        overflow-x: auto;
+    }
+}
+
+.message-content code {
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 2px 4px;
+    border-radius: 30px;
+    font-family: monospace;
+    font-size: 90%;
+}
+
+/* Style for lists in markdown */
+.message-content ul, 
+.message-content ol {
+    margin-left: 20px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+/* Style for blockquotes */
+.message-content blockquote {
+    border-left: 3px solid #ccc;
+    padding-left: 8px;
+    color: #666;
+    margin: 4px 0;
+}
+
+/* Style for links */
+.message-content a {
+    color: #075e54;
+    text-decoration: underline;
+}
+
+/* Style for paragraphs */
+.message-content p {
+    margin: 0 0 4px 0;
+    line-height: 1.4;
+}
+
+.message-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Preserve whitespace but allow wrapping */
+.message-content {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.user-image {
+    align-self: flex-end;
+    margin-bottom: 5px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.user-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Styling for markdown content */
+.message code {
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 2px 4px;
+    border-radius: 30px;
+    font-family: monospace;
+    font-size: 90%;
+}
+
+.message pre {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 8px;
+    border-radius: 30px;
+    overflow-x: auto;
+    margin: 8px 0;
+}
+
+.message blockquote {
+    border-left: 3px solid #ccc;
+    padding-left: 8px;
+    color: #666;
+    margin: 4px 0;
+}
+
+.message ul, .message ol {
+    margin-left: 20px;
+}
+
+/* Update the chat input area to be transparent */
+.chat-input {
+    display: flex;
+    padding: 12px 16px;
+    background: transparent; /* No background, will use parent's gradient */
+    align-items: flex-end;
+    border-top: none; /* Remove the separator */
+    position: relative;
+}
+
+/* Keep the textarea with a clean white background */
+.chat-input textarea {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 25px;
+    outline: none;
+    background-color: #ffffff; /* Pure white background */
+    margin-right: 12px;
+    font-size: 14px;
+    resize: none;
+    overflow-y: auto;
+    max-height: 100px;
+    min-height: 45px;
+    line-height: 1.4;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    border: 1px solid rgba(230, 230, 230, 0.8);
+}
+
+/* Update the button styles to work better on the gradient */
+.voice-button {
+    background-color: rgba(255, 255, 255, 0.7); /* More visible on the gradient */
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.voice-button:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.send-button {
+    background: linear-gradient(135deg, var(--chat-bg-gradient-start), #4a7bbd); /* Richer gradient */
+    color: white;
+    border: none;
+    width: 38px; /* Slightly larger */
+    height: 38px; /* Slightly larger */
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+}
+
+.send-button:hover {
+    transform: scale(1.05);
+}
+
+/* Message bubble tails */
+.user-message:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: -10px;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-left-color: #dcf8c6;
+    border-right: 0;
+    border-top: 0;
+}
+
+.bot-message:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -10px;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-right-color: white;
+    border-left: 0;
+    border-top: 0;
+}
+
+/* Welcome message styling */
+.welcome-message {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.welcome-message::after {
+    content: "";
+    position: absolute;
+    bottom: -15px;
+    left: 0;
+    right: 0;
+    height: 15px;
+    background: linear-gradient(to bottom, rgba(60, 203, 208, 0.7), transparent);
+}
+
+.message.welcome {
+    margin-bottom: 0;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure bot content wraps properly */
+.bot-content {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Add a bit more spacing between consecutive bot messages */
+.bot-wrapper + .bot-wrapper {
+    margin-top: 12px;
+    position: relative;
+}
+
+/* Update the separator styles for consecutive bot messages */
+.bot-wrapper + .bot-wrapper::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    left: 20%;
+    right: 20%;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.05); /* More visible against solid background */
+}
+
+/* Make bot messages visually distinct */
+.bot-message {
+    position: relative;
+}
+
+/* Optimize the streaming message specifically */
+.bot-message.streaming {
+    border-left: 3px solid #075e54;
+    animation: color-pulse 2s ease-in-out infinite;
+    background-color: rgba(255, 255, 255, 0.95);
+    will-change: border-color;
+    height: auto;
+    min-height: 60px;
+}
+
+/* Replace the pulse-border animation to avoid layout shifting */
+@keyframes color-pulse {
+    0% { border-left-color: #075e54; }
+    50% { border-left-color: #88d3ce; }
+    100% { border-left-color: #075e54; }
+}
+
+/* Remove any transforms that might interfere */
+.bot-message.streaming * {
+    transform: none !important;
+    transition: none !important;
+}
+
+/* Stabilize the message content */
+.message-content {
+    position: relative;
+    min-width: 60px;
+    min-height: 20px;
+    transform: translateZ(0);
+    will-change: contents;
+    transition: none !important;
+    white-space: pre-wrap;
+    word-break: break-word;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Ensure code blocks don't cause layout shifts */
+.message-content pre {
+    min-height: 35px;
+    overflow-x: hidden;
+    &:hover {
+        overflow-x: auto;
+    }
+}
+
+/* Optimize rendering performance globally */
+* {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    backface-visibility: hidden;
+    animation-duration: 0s !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+}
+
+/* Override specific animations we want to keep */
+.bot-message.streaming {
+    animation-duration: 2s !important;
+}
+
+.typing-dot:nth-child(1) {
+    animation-duration: 1.2s !important;
+}
+
+.typing-dot:nth-child(2) {
+    animation-duration: 1.2s !important;
+}
+
+.typing-dot:nth-child(3) {
+    animation-duration: 1.2s !important;
+}
+
+/* Enhance bounce animation performance */
+@keyframes bounce {
+    0%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-6px);
+    }
+}
+
+/* Fix scrolling behavior */
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Make user messages align right */
+.user-wrapper {
+    justify-content: flex-end;
+}
+
+/* Make bot messages align left */
+.bot-wrapper {
+    justify-content: flex-start;
+}
+
+/* Add more visual distinction between messages */
+.user-message {
+    background-color: #dcf8c6b6;
+    border-top-right-radius: 2px;
+}
+
+.bot-message {
+    background-color: white;
+    border-top-left-radius: 2px;
+}
+
+/* Enhance the streaming message indicator */
+.streaming {
+    border-left: 3px solid #075e54;
+    animation: pulse-border 1.5s infinite;
+}
+
+/* Reduce spacing between list items */
+.message-content ul li,
+.message-content ol li {
+    margin-bottom: 2px;
+}
+
+/* Fix for empty lines in Markdown */
+.message-content br + br {
+    display: none;
+}
+
+/* Remove any triangular shapes */
+.message::before,
+.message::after {
+    display: none !important;
+}
+
+/* Update the message bubbles to be rectangular */
+.message {
+    padding: 8px 12px;
+    border-radius: 20px;
+    max-width: 85%;
+    word-wrap: break-word;
+    margin-bottom: 6px;
+    position: relative;
+    min-height: 35px;
+}
+
+/* User messages */
+.user-message {
+    background-color: #C4C4C4;
+    color: #000;
+    align-self: flex-end;
+    margin-left: auto;
+}
+
+/* Bot messages */
+.bot-message {
+    background-color: #f5f5f5;
+    color: #000;
+    align-self: flex-start;
+    margin-right: auto;
+    min-width: 300px;
+    width: 92%;
+}
+
+/* Remove any triangular shapes */
+.message::before,
+.message::after {
+    display: none !important;
+}
+
+/* Style for the static image in the header */
+.static-image {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.static-image img {
+    width: 70px;
+    height: 45px;
+    border-radius: 20px;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Ensure the last message doesn't have an excessive bottom margin */
+.message-wrapper:last-child .message {
+    margin-bottom: 0;
+}
+
+/* Typing indicator styles */
+.typing-indicator {
+    display: none; /* Hide the old styling */
+}
+
+.typing-dots {
+    display: flex;
+    align-items: center;
+    padding: 10px 5px;
+}
+
+.typing-dot {
+    height: 8px;
+    width: 8px;
+    margin: 0 2px;
+    background-color: #8a8a8a;
+    border-radius: 50%;
+    opacity: 0.6;
+}
+
+.typing-dot:nth-child(1) {
+    animation: bounce 1.2s infinite 0s;
+}
+
+.typing-dot:nth-child(2) {
+    animation: bounce 1.2s infinite 0.15s;
+}
+
+.typing-dot:nth-child(3) {
+    animation: bounce 1.2s infinite 0.3s;
+}
+
+@keyframes bounce {
+    0%, 80%, 100% {
+        transform: translateY(0) translateZ(0);
+    }
+    40% {
+        transform: translateY(-6px) translateZ(0);
+    }
+}
+
+/* Container for the typing indicator */
+.bot-wrapper.typing {
+    justify-content: flex-start;
+    margin-bottom: 8px;
+}
+
+/* API Key indicator */
+.api-key-indicator {
+    margin-left: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.api-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+/* Add these styles to control image sizing in messages */
+.message-content img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    object-fit: contain;
+    margin: 5px 0;
+    display: block;
+}
+
+/* Optional: Add a nice hover effect and cursor for images */
+.message-content img:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+}
+
+/* Add a container for images to provide proper scaling */
+.message-content .image-container {
+    display: inline-block;
+    max-width: 100%;
+    margin: 5px 0;
+}
+
+/* Make images in bot messages properly sized */
+.bot-message .message-content img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Add a specific class for large images that need special handling */
+.message-content .large-image {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Add styles for system debug messages */
+.message-system {
+    padding: 8px 12px;
+    margin: 5px 0;
+    border-radius: 8px;
+    max-width: 85%;
+    align-self: center;
+    background-color: #f8f9fa;
+    color: #666;
+    font-size: 0.9em;
+    border: 1px dashed #ccc;
+    font-family: monospace;
+}
+
+.message-system.error {
+    background-color: #fff1f0;
+    border-color: #ffccc7;
+    color: #cf1322;
+}
+
+.message-system.debug {
+    background-color: #f0f9ff;
+    border-color: #bae7ff;
+    color: #1677ff;
+}
+
+/* Make the chat window more responsive */
+@media (max-width: 576px) {
+    .chat-expanded {
+        width: 100%;
+        height: 100%;
+        bottom: 0;
+        border-radius: 10px;
+    }
+    
+    .bot-message {
+        min-width: 200px;
+        width: 85%;
+    }
+}
+
+/* Media Queries for different devices */
+
+/* Mobile devices (up to 576px) */
+@media screen and (max-width: 576px) {
+    .chat-container {
+        bottom: 0;
+        right: 0;
+        width: 100%;
+    }
+
+    .chat-expanded {
+        width: 100%;
+        height: 100vh;
+        bottom: 0;
+        border-radius: 0;
+        position: fixed;
+    }
+
+    .chat-header {
+        padding: 8px 12px;
+        height: 50px;
+    }
+
+    .avatar img {
+        width: 35px;
+        height: 35px;
+    }
+
+    .chat-input textarea {
+        min-height: 40px;
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .chat-input {
+        padding: 10px;
+    }
+
+    .voice-button,
+    .send-button {
+        width: 34px;
+        height: 34px;
+    }
+
+    .message {
+        max-width: 90%;
+    }
+}
+
+/* Tablet devices (577px to 992px) */
+@media screen and (min-width: 577px) and (max-width: 992px) {
+    .chat-expanded {
+        width: 420px;
+        height: 550px;
+        bottom: 70px;
+    }
+
+    .chat-header {
+        height: 55px;
+    }
+
+    .avatar img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .chat-input textarea {
+        min-height: 42px;
+        font-size: 14px;
+    }
+
+    .message {
+        max-width: 88%;
+    }
+}
+
+/* Small laptops (993px to 1200px) */
+@media screen and (min-width: 993px) and (max-width: 1200px) {
+    .chat-expanded {
+        width: 480px;
+        height: 580px;
+    }
+}
+
+/* Landscape mode for mobile devices */
+@media screen and (max-width: 576px) and (orientation: landscape) {
+    .chat-expanded {
+        height: 100vh;
+    }
+
+    .chat-messages {
+        padding: 10px;
+    }
+
+    .chat-input textarea {
+        max-height: 60px;
+    }
+}
+
+/* High-resolution displays */
+@media screen and (min-width: 1201px) {
+    .chat-expanded {
+        width: 520px;
+        height: 600px;
+    }
+}
+
+/* Additional responsive adjustments */
+@media (any-hover: hover) {
+    .chat-logo:hover {
+        transform: scale(1.05);
+    }
+
+    .send-button:hover {
+        transform: scale(1.05);
+    }
+}
+
+/* Ensure proper scrolling on mobile */
+@media (hover: none) and (pointer: coarse) {
+    .chat-messages {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .chat-input textarea {
+        -webkit-appearance: none;
+    }
+}
+
+/* Safe area adjustments for modern mobile devices */
+@supports (padding: max(0px)) {
+    @media screen and (max-width: 576px) {
+        .chat-container {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .chat-input {
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
+        }
+    }
+}
